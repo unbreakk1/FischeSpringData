@@ -3,6 +3,7 @@ package org.example.fischespringdata;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AsterixService
@@ -48,6 +49,30 @@ public class AsterixService
     {
         return asterixRepo.findById(id).orElse(null);
     }
+
+    public Character updateCharacter(String id, CharacterUpdateDTO dto) throws Exception
+    {
+        // Fetch the existing character by its id
+        Optional<Character> optionalCharacter = asterixRepo.findById(id);
+        if (optionalCharacter.isEmpty()) {
+            throw new Exception("Character not found");
+        }
+
+        Character existingCharacter = optionalCharacter.get();
+
+
+        Character updatedCharacter = new Character
+        (
+                existingCharacter.id(),
+                dto.getName() != null ? dto.getName() : existingCharacter.name(), // Update name if provided, otherwise keep the existing
+                dto.getAge() != null ? dto.getAge() : existingCharacter.age(),    // Update age if provided
+                dto.getProfession() != null ? dto.getProfession() : existingCharacter.profession() // Update profession if provided
+        );
+
+        // Save the new record back to the repository
+        return asterixRepo.save(updatedCharacter);
+    }
+
 
     public void deleteCharacterById(String id)
     {

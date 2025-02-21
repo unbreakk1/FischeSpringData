@@ -1,4 +1,4 @@
-﻿package org.example.fischespringdata;
+package org.example.fischespringdata;
 
 import org.springframework.stereotype.Service;
 

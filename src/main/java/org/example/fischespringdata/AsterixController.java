@@ -87,20 +87,17 @@ public class AsterixController
 
     // Update a character by ID
     @PutMapping("/characters/{id}")
-    public ResponseEntity<?> updateCharacter(@PathVariable String id, @RequestBody CharacterDTO characterDTO)
-    {
-        Character updatedCharacter = new Character
-        (
-                id,
-                characterDTO.getName(),
-                characterDTO.getAge(),
-                characterDTO.getProfession()
-        );
-        // Save or update character
-        Character savedCharacter = asterixService.addCharacter(updatedCharacter);
-
-        return ResponseEntity.ok(savedCharacter);
+    public ResponseEntity<?> updateCharacter(@PathVariable String id, @RequestBody CharacterUpdateDTO dto) {
+        try {
+            Character updatedCharacter = asterixService.updateCharacter(id, dto);
+            return ResponseEntity.ok(updatedCharacter);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update character");
+        }
     }
+
 
 }
 
