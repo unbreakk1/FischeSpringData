@@ -1,5 +1,7 @@
 package org.example.fischespringdata;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +25,34 @@ public class AsterixController
     }
 
     @PostMapping("/characters")
-    public Character addCharacter(@RequestBody Character character)
+    public ResponseEntity<?> addCharacter(@RequestBody CharacterDTO characterDTO)
     {
-        return characterService.addCharacter(character);
+        if (characterDTO.getName() == null || characterDTO.getName().isEmpty())
+
+            return ResponseEntity.badRequest().body("Character name is required");
+
+        String randomId = java.util.UUID.randomUUID().toString();
+
+        Character character = new Character
+        (
+                randomId,
+                characterDTO.getName(),
+                characterDTO.getAge(),
+                characterDTO.getProfession()
+        );
+
+        try
+        {
+            Character savedCharacter = characterService.addCharacter(character);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedCharacter);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save character");
+        }
+
     }
+
+
 
 }
