@@ -20,10 +20,19 @@ public class AsterixController
 
     // Get all characters
     @GetMapping("/characters")
-    public List<Character> getCharacters()
-    {
-        return asterixService.getAllCharacters();
+    public ResponseEntity<?> getCharacters(@RequestParam(value = "age", required = false) Integer age) {
+        if (age != null)
+        {
+            // Perform filtering if age is provided
+            List<Character> filteredCharacters = asterixService.getCharactersByMaxAge(age);
+            return ResponseEntity.ok(filteredCharacters);
+        }
+
+        // Default behavior if age is null
+        List<Character> allCharacters = asterixService.getAllCharacters();
+        return ResponseEntity.ok(allCharacters);
     }
+
 
     // Get a character by ID
     @GetMapping("/characters/{id}")

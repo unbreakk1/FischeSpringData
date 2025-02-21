@@ -21,9 +21,16 @@ public class AsterixService
         return asterixRepo.findAll();
     }
 
+    public List<Character> getCharactersByMaxAge(int maxAge)
+    {
+        List<Character> allCharacters = asterixRepo.findAll();
+
+        return allCharacters.stream().filter(character -> character.age() <= maxAge)
+                .toList();
+    }
+
     public Character addCharacter(Character characterWithoutId)
     {
-        // Generate a random ID for the new character
         String randomId = idService.randomId();
 
         // Build the complete Character object (including the generated ID)
@@ -34,10 +41,8 @@ public class AsterixService
                 characterWithoutId.profession()
         );
 
-        // Save the character to the repository
         return asterixRepo.save(newCharacter);
     }
-
 
     public Character getCharacterById(String id)
     {
