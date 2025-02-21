@@ -140,6 +140,8 @@ class AsterixServiceTest
         assertThat(result).isEqualTo(savedCharacter);
         verify(idService, times(1)).randomId();
         verify(asterixRepo, times(1)).save(any(Character.class));
+
+        verifyNoMoreInteractions(idService, asterixRepo);
     }
 
 }
