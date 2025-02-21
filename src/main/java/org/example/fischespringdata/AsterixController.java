@@ -10,7 +10,6 @@ import java.util.List;
 @RequestMapping("/asterix")
 public class AsterixController
 {
-
     private final AsterixService asterixService;
 
     public AsterixController(AsterixService asterixService)
@@ -32,7 +31,6 @@ public class AsterixController
         List<Character> allCharacters = asterixService.getAllCharacters();
         return ResponseEntity.ok(allCharacters);
     }
-
 
     // Get a character by ID
     @GetMapping("/characters/{id}")
