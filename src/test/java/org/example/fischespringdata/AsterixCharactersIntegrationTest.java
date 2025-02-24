@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FischeSpringDataApplication.class)
 @AutoConfigureMockMvc
-@Transactional // Rolls back changes after tests are executed
+@Commit
 public class AsterixCharactersIntegrationTest
 {
 
@@ -31,9 +32,18 @@ public class AsterixCharactersIntegrationTest
         service.deleteCharacterById("1");
         service.deleteCharacterById("2");
 
-        service.addCharacter(new Character("1", "Max", 10, "Warrior"));
-        service.addCharacter(new Character("2", "Obelix", 35, "Builder"));
+        Character character1 = new Character("1", "Max", 10, "Warrior");
+        Character character2 = new Character("2", "Obelix", 35, "Builder");
+
+        service.addCharacter(character1);
+        service.addCharacter(character2);
+
+        System.out.println("Added characters:");
+        System.out.println(service.getCharacterById("1"));
+        System.out.println(service.getCharacterById("2"));
     }
+
+
 
     @Test
     void shouldGetAllCharacters() throws Exception
