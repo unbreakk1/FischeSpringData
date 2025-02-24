@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest
+@SpringBootTest(classes = FischeSpringDataApplication.class)
 @AutoConfigureMockMvc
 public class AsterixCharactersIntegrationTest
 {
