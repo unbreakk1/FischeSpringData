@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Commit
 public class AsterixCharactersIntegrationTest
 {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -42,8 +41,6 @@ public class AsterixCharactersIntegrationTest
         System.out.println(service.getCharacterById("1"));
         System.out.println(service.getCharacterById("2"));
     }
-
-
 
     @Test
     void shouldGetAllCharacters() throws Exception
@@ -93,7 +90,6 @@ public class AsterixCharactersIntegrationTest
         assert characters.stream().anyMatch(c -> c.name().equals("Vitalstatistix")) :
                 "Character 'Vitalstatistix' was not found in the list";
     }
-
 
     @Test
     void shouldDeleteCharacter() throws Exception
