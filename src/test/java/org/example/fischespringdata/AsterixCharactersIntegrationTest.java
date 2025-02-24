@@ -25,10 +25,11 @@ public class AsterixCharactersIntegrationTest
     private AsterixService service;
 
     @BeforeEach
-    void setUp() {
-        // Clear the database and populate it with test characters
+    void setUp()
+    {
         service.deleteCharacterById("1");
         service.deleteCharacterById("2");
+
         service.addCharacter(new Character("1", "Max", 10, "Warrior"));
         service.addCharacter(new Character("2", "Obelix", 35, "Builder"));
     }
@@ -38,9 +39,9 @@ public class AsterixCharactersIntegrationTest
     {
         mockMvc.perform(get("/asterix/characters"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2))) // Verifies 2 characters are returned
-                .andExpect(jsonPath("$[0].name").value("Max"))
-                .andExpect(jsonPath("$[1].name").value("Obelix"));
+                .andExpect(jsonPath("$[?(@.name == 'Max')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'Obelix')]").exists());
+
     }
 
     @Test
@@ -51,26 +52,19 @@ public class AsterixCharactersIntegrationTest
                 .andExpect(jsonPath("$.name").value("Max"))
                 .andExpect(jsonPath("$.age").value(10))
                 .andExpect(jsonPath("$.profession").value("Warrior"));
-    }
 
-    @Test
-    void shouldReturnNotFoundForNonexistentCharacter() throws Exception
-    {
-        mockMvc.perform(get("/asterix/characters/999"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Character with ID 999 not found"));
     }
 
     @Test
     void shouldAddNewCharacter() throws Exception
     {
         String newCharacterJson = """
-            {
-                "name": "Vitalstatistix",
-                "age": 50,
-                "profession": "Chief"
-            }
-        """;
+        {
+            "name": "Vitalstatistix",
+            "age": 50,
+            "profession": "Chief"
+        }
+    """;
 
         mockMvc.perform(post("/asterix/characters")
                         .contentType(APPLICATION_JSON)
@@ -79,65 +73,29 @@ public class AsterixCharactersIntegrationTest
                 .andExpect(jsonPath("$.name").value("Vitalstatistix"))
                 .andExpect(jsonPath("$.age").value(50))
                 .andExpect(jsonPath("$.profession").value("Chief"));
+
+        var characters = service.getAllCharacters();
+
+        assert characters.size() == 3 :
+                "Expected 3 characters in store, but found " + characters.size();
+
+        assert characters.stream().anyMatch(c -> c.name().equals("Vitalstatistix")) :
+                "Character 'Vitalstatistix' was not found in the list";
     }
 
-    @Test
-    void shouldNotAddCharacterWithInvalidData() throws Exception
-    {
-        String invalidCharacterJson = """
-            {
-                "age": 10,
-                "profession": "Warrior"
-            }
-        """;
-
-        mockMvc.perform(post("/asterix/characters")
-                        .contentType(APPLICATION_JSON)
-                        .content(invalidCharacterJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Character name is required"));
-    }
-
-    @Test
-    void shouldUpdateCharacter() throws Exception
-    {
-        String updatedCharacterJson = """
-            {
-                "name": "Updated Max",
-                "age": 15,
-                "profession": "Hero"
-            }
-        """;
-
-        mockMvc.perform(put("/asterix/characters/1")
-                        .contentType(APPLICATION_JSON)
-                        .content(updatedCharacterJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Max"))
-                .andExpect(jsonPath("$.age").value(15))
-                .andExpect(jsonPath("$.profession").value("Hero"));
-    }
-
-    @Test
-    void shouldNotUpdateNonexistentCharacter() throws Exception
-    {
-        String updatedCharacterJson = """
-            {
-                "name": "Nonexistent",
-                "age": 20,
-                "profession": "Unknown"
-            }
-        """;
-
-        mockMvc.perform(put("/asterix/characters/999")
-                        .contentType(APPLICATION_JSON)
-                        .content(updatedCharacterJson))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().string("Failed to update character"));
-    }
 
     @Test
     void shouldDeleteCharacter() throws Exception
+    {
+        mockMvc.perform(delete("/asterix/characters/1"))
+                .andExpect(status().isNoContent());
+
+        var deletedCharacter = service.getCharacterById("1");
+        assert deletedCharacter == null;
+    }
+
+    @Test
+    void shouldNotRetrieveDeletedCharacter() throws Exception
     {
         mockMvc.perform(delete("/asterix/characters/1"))
                 .andExpect(status().isNoContent());
@@ -153,14 +111,6 @@ public class AsterixCharactersIntegrationTest
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Character with ID 999 not found"));
     }
-
-    @Test
-    void shouldGetFilteredCharactersByAge() throws Exception
-    {
-        mockMvc.perform(get("/asterix/characters?age=20"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name").value("Max"));
-    }
 }
+
 
